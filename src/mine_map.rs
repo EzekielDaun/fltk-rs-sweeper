@@ -56,6 +56,7 @@ pub struct MineMap {
     map: Array2<Block>,
     buttons: Array2<Button>,
     sender: Sender<message::MouseMessage>,
+    mine: usize,
 }
 
 impl MineMap {
@@ -79,6 +80,7 @@ impl MineMap {
             map: Self::generate_map(row, col, mine),
             buttons,
             sender,
+            mine,
         };
 
         temp.map_buttons();
@@ -176,7 +178,7 @@ impl MineMap {
 
     pub fn restart(&mut self) {
         let (r, c) = (self.map.shape()[0], self.map.shape()[1]);
-        self.map = Self::generate_map(r, c, 8);
+        self.map = Self::generate_map(r, c, self.mine);
 
         self.map_buttons();
         self.buttons.iter_mut().for_each(|button| {

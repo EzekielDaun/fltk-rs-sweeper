@@ -9,3 +9,4 @@ edition = "2021"
 fltk = { version = "^1.2", features = ["fltk-bundled"] }
 ndarray = "0.15.4"
 rand = "0.8.4"
+structopt = "0.3.25"
