@@ -1,5 +1,6 @@
-// #![windows_subsystem = "windows"]
-use fltk::{app, button::Button, group, prelude::*, window::Window};
+#![windows_subsystem = "windows"]
+use fltk::{app, button::Button, group, image::PngImage, prelude::*, window::Window};
+use rust_embed::RustEmbed;
 use std::{
     cmp,
     sync::atomic::{AtomicBool, AtomicU32, Ordering},
@@ -35,15 +36,25 @@ struct Opt {
     mine: usize,
 }
 
+#[derive(RustEmbed)]
+#[folder = "./asset"]
+struct Asset;
+
 fn main() {
     let opt = Opt::from_args();
     let (row_num, col_num, mine_num) = (opt.row, cmp::max(opt.col, 5), opt.mine);
 
     let app = app::App::default();
+
+    let bytes = Asset::get("icon.png").unwrap();
+    let png = PngImage::from_data(bytes.data.as_ref()).unwrap();
+
     let mut wind = Window::default()
         .with_size(BUT_SIZE * col_num as i32, BUT_SIZE * row_num as i32 + TOP)
         .center_screen()
         .with_label("fltk-sweeper");
+
+    wind.set_icon(Some(png));
 
     let (mouse_sender, mouse_receiver) = app::channel();
 

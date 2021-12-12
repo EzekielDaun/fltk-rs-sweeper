@@ -88,6 +88,7 @@ impl MineMap {
         temp
     }
 
+    /// handle the mouse message, update the blocks and buttons
     pub fn input(&mut self, message: message::MouseMessage) -> bool {
         let block = &mut self.map[message.location];
         let button = &mut self.buttons[message.location];
@@ -101,6 +102,7 @@ impl MineMap {
 
                     match block.cell {
                         Cell::Mine => {
+                            self.show_all();
                             return false;
                         }
                         Cell::Blank(0) => {
@@ -153,6 +155,7 @@ impl MineMap {
         true
     }
 
+    /// check the winning condition, return true if win, otherwise false
     pub fn check_win(&mut self) -> bool {
         for block in self.map.iter() {
             let cell = &block.cell;
@@ -166,6 +169,7 @@ impl MineMap {
         true
     }
 
+    /// restart the same game
     pub fn restart_same(&mut self) {
         self.map.indexed_iter_mut().for_each(|(location, block)| {
             let button = &mut self.buttons[location];
@@ -176,6 +180,7 @@ impl MineMap {
         });
     }
 
+    /// restart a new game
     pub fn restart(&mut self) {
         let (r, c) = (self.map.shape()[0], self.map.shape()[1]);
         self.map = Self::generate_map(r, c, self.mine);
@@ -190,6 +195,16 @@ impl MineMap {
         self.flush_display();
     }
 
+    /// set buttons to show all blocks, used when lose
+    fn show_all(&mut self) {
+        self.map
+            .iter_mut()
+            .for_each(|block| block.state = State::Revealed);
+        self.buttons.iter_mut().for_each(|b| b.set(true));
+        self.flush_display();
+    }
+
+    /// set buttons to show correspond block
     fn flush_display(&mut self) {
         for (location, block) in self.map.indexed_iter_mut() {
             let button = &mut self.buttons[location];
@@ -206,6 +221,7 @@ impl MineMap {
         }
     }
 
+    /// add callback to buttons
     fn map_buttons(&mut self) {
         self.map.indexed_iter_mut().for_each(|(location, _)| {
             let sender = self.sender.clone();
